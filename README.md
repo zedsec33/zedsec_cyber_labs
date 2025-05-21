@@ -1,54 +1,198 @@
-<header>
+# 🧨 ZedSec Cyber Lab Architectures
 
-<!--
-  <<< Author notes: Course header >>>
-  Include a 1280×640 image, course title in sentence case, and a concise description in emphasis.
-  In your repository settings: enable template repository, add your 1280×640 social image, auto delete head branches.
-  Add your open source license, GitHub uses MIT license.
--->
-
-# GitHub Pages
-
-_Create a site or blog from your GitHub repositories with GitHub Pages._
-
-</header>
-
-<!--
-  <<< Author notes: Step 1 >>>
-  Choose 3-5 steps for your course.
-  The first step is always the hardest, so pick something easy!
-  Link to docs.github.com for further explanations.
-  Encourage users to open new tabs for steps!
--->
-
-## Step 1: Enable GitHub Pages
-
-_Welcome to GitHub Pages and Jekyll :tada:!_
-
-The first step is to enable GitHub Pages on this [repository](https://docs.github.com/en/get-started/quickstart/github-glossary#repository). When you enable GitHub Pages on a repository, GitHub takes the content that's on the main branch and publishes a website based on its contents.
-
-### :keyboard: Activity: Enable GitHub Pages
-
-1. Open a new browser tab, and work on the steps in your second tab while you read the instructions in this tab.
-1. Under your repository name, click **Settings**.
-1. Click **Pages** in the **Code and automation** section.
-1. Ensure "Deploy from a branch" is selected from the **Source** drop-down menu, and then select `main` from the **Branch** drop-down menu.
-1. Click the **Save** button.
-1. Wait about _one minute_ then refresh this page (the one you're following instructions from). [GitHub Actions](https://docs.github.com/en/actions) will automatically update to the next step.
-   > Turning on GitHub Pages creates a deployment of your repository. GitHub Actions may take up to a minute to respond while waiting for the deployment. Future steps will be about 20 seconds; this step is slower.
-   > **Note**: In the **Pages** of **Settings**, the **Visit site** button will appear at the top. Click the button to see your GitHub Pages site.
-
-<footer>
-
-<!--
-  <<< Author notes: Footer >>>
-  Add a link to get support, GitHub status page, code of conduct, license link.
--->
+Welcome to the **ZedSec BlackCell Cyber Lab Repository** – a modular, powerful, and surgical set of lab setups tailored for offensive security, malware analysis, and real-world adversarial simulation.
 
 ---
 
-Get help: [Post in our discussion board](https://github.com/orgs/skills/discussions/categories/github-pages) &bull; [Review the GitHub status page](https://www.githubstatus.com/)
+## 🧠 Lab 1: Offensive Operations Lab
 
-&copy; 2023 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
+### 🔧 Purpose
+- Red Teaming
+- Reverse Shell Payloads
+- C2 Infrastructure
 
-</footer>
+### 🖥️ Host Setup
+```bash
+sudo pacman -S virtualbox python python-pip wireshark nmap net-tools
+```
+
+### 📦 VMs
+| VM       | OS         | Role      |
+|----------|------------|-----------|
+| Kali     | Kali Linux | Attacker  |
+| Win10    | Win10 x86  | Victim    |
+
+### 📡 Network
+- VirtualBox Host-Only Adapter
+
+### 🛠 Automation (bash)
+```bash
+#!/bin/bash
+vboxmanage createvm --name Attacker --register
+vboxmanage createvm --name Victim --register
+# Add more VBox automation like attaching ISOs, CPUs, memory, networking...
+```
+
+---
+
+## 🔬 Lab 2: Malware Dev & RE Lab
+
+### 🔧 Purpose
+- Build/Analyze malware safely
+- Static & Dynamic RE
+
+### 🧰 Tools
+- VirtualBox
+- FLARE VM
+- REMnux
+- Wireshark, Fakenet-NG
+- x64dbg, Ghidra, PEStudio
+
+### 🛠 Automation (Vagrant + Shell)
+```bash
+# Vagrantfile sample for Win10 + FLARE
+Vagrant.configure("2") do |config|
+  config.vm.box = "gusztavvargadr/windows-10"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "4096"
+  end
+end
+```
+
+---
+
+## 🌐 Lab 3: Web Pentesting & SQLi Lab
+
+### 🔧 Purpose
+- SQL Injection
+- XSS/LFI
+- Web App Recon
+
+### 🧰 Apps
+- DVWA, Mutillidae, WordPress (old plugins)
+
+### 🛠 Automation
+```bash
+sudo apt update && sudo apt install apache2 php mysql-server php-mysql
+wget https://github.com/digininja/DVWA/archive/master.zip
+unzip master.zip && mv DVWA* /var/www/html/dvwa
+```
+
+---
+
+## 🎭 Lab 4: Network Attacks Lab
+
+### 🔧 Purpose
+- ARP Spoofing
+- Packet Sniffing
+- MITM
+
+### 🧰 Tools
+- Scapy
+- Bettercap
+- Wireshark
+
+### 🛠 Automation
+```bash
+sudo pacman -S scapy wireshark-qt bettercap
+```
+
+---
+
+## 🧪 Lab 5: Social Engineering & Phishing Lab
+
+### 🔧 Purpose
+- Email Spoofing
+- Payload Drop
+- Rubber Ducky Testing
+
+### 🛠 Automation
+```bash
+# Install SET
+git clone https://github.com/trustedsec/social-engineer-toolkit.git
+cd social-engineer-toolkit && pip install -r requirements.txt
+python setup.py install
+```
+
+---
+
+## 💣 Lab 6: Exploit Dev & Fuzzing Lab
+
+### 🔧 Purpose
+- Buffer Overflows
+- SEH Chains
+
+### 🧰 Tools
+- Immunity Debugger + Mona.py
+- SLMail, Vulnserver
+
+### 🛠 Automation
+```powershell
+# Windows setup
+choco install immunitydebugger
+# Copy mona.py into %ProgramFiles%\Immunity Debugger\PyCommands
+```
+
+---
+
+## 📡 Lab 7: Multi-Agent C2 Lab
+
+### 🔧 Purpose
+- GitHub C2
+- Multi-repo command polling
+
+### 📦 GitHubC2 Skeleton
+```python
+import requests, base64
+repo = 'https://api.github.com/repos/youruser/yourrepo/contents/task.txt'
+token = 'ghp_XXXX'
+r = requests.get(repo, headers={'Authorization': f'token {token}'})
+cmd = base64.b64decode(r.json()['content']).decode()
+```
+
+### 🛠 Automation
+```bash
+echo "echo Y21kIC9jICdzZWN1cml0eSB0ZXN0aW5nJyA+IHJlc3VsdC50eHQ=" | base64 -d > task.sh
+```
+
+---
+
+## 📦 Wordlists, Payloads & Resources
+- `PayloadsAllTheThings`
+- `awesome-wordlists`
+- `Wordlist-Hub`
+
+Clone them into `tools/` for seamless integration into fuzzers & brute-force scripts.
+
+```bash
+git clone https://github.com/swisskyrepo/PayloadsAllTheThings tools/payloads
+```
+
+---
+
+## 🔥 Strategy Profiles
+
+| Profile        | Labs Used                                  |
+|----------------|---------------------------------------------|
+| **Strike Lab** | 1, 3, 4, 5                                  |
+| **Analysis Lab** | 2, 6, 7                                    |
+| **Legacy Lab** | 6 (Win7)                                    |
+| **OPSEC Lab**  | 1, 2, 7 with focus on stealth & evasion     |
+
+---
+
+## 🧠 ZedSec Lab Execution Tips
+
+- Use snapshots aggressively
+- Set networking to Host-Only or Internal NAT
+- Never leak lab traffic to public networks
+- Combine automation (Vagrant + shell scripts + VBoxManage)
+
+---
+
+> ⚔️ Build labs that strike fast, hide deep, and train hard.
+
+Licensed for ethical use only.
+
+**– ZedSec BlackCell**
+
